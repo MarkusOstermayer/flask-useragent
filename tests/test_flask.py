@@ -1,14 +1,14 @@
-def test_user_agent_route(app, client):
+def test_user_agent_route(ua_app, client):
 
-    @app.ua_route("/", user_agent="user-agent-1")
+    @ua_app.ua_route("/", user_agent="user-agent-1")
     def index_user_agent_1():
         return "index_user_agent_1"
 
-    @app.ua_route("/", user_agent=r"user-agent-[0-9]")
+    @ua_app.ua_route("/", user_agent=r"user-agent-[0-9]")
     def index_user_agent_0_9():
         return "index_user_agent_0-9"
 
-    @app.fallback("/")
+    @ua_app.fallback("/")
     def index_fallback():
         return "index_fallback"
 
@@ -25,9 +25,9 @@ def test_user_agent_route(app, client):
     assert rv.data == b"index_fallback"
 
 
-def test_invalid_route(app, client):
+def test_invalid_route(ua_app, client):
 
-    @app.ua_route("/", user_agent="user-agent-1")
+    @ua_app.ua_route("/", user_agent="user-agent-1")
     def index_user_agent_1():
         return "index_user_agent_1"
 
@@ -39,10 +39,10 @@ def test_invalid_route(app, client):
     assert rv.status == "404 NOT FOUND"
 
 
-def test_mixed_decorator(app, client):
+def test_mixed_decorator(app, ua_app, client):
 
     @app.route("/index")
-    @app.ua_route("/", user_agent="user-agent-1")
+    @ua_app.ua_route("/", user_agent="user-agent-1")
     def index_user_agent_1():
         return "index_user_agent_1"
 
@@ -54,10 +54,10 @@ def test_mixed_decorator(app, client):
     assert rv.data == b"index_user_agent_1"
 
 
-def test_ua_decorator_without_argument(app, client):
+def test_ua_decorator_without_argument(app, ua_app, client):
 
     # this should use the route just like the fallback decorator does
-    @app.ua_route("/")
+    @ua_app.ua_route("/")
     def index_user_agent_1():
         return "index_user_agent_1"
 

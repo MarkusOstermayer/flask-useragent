@@ -9,9 +9,9 @@ from .helper import EndpointContainer
 F = TypeVar("F", bound=Callable[..., Any])
 
 
-class Flask(flask.Flask):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+class FlaskUserAgent():
+    def __init__(self, app: flask.app.Flask):
+        self.app = app
         self.endpoint_rules: EndpointContainer = EndpointContainer()
 
     # from: https://github.com/pallets/flask/blob/main/src/flask/scaffold.py
@@ -28,7 +28,7 @@ class Flask(flask.Flask):
 
             self.endpoint_rules.add_function(rule, user_agent, func)
 
-            self.add_url_rule(rule, endpoint, self.routehelper, **options)
+            self.app.add_url_rule(rule, endpoint, self.routehelper, **options)
 
             return func
 
@@ -39,7 +39,7 @@ class Flask(flask.Flask):
             endpoint = options.pop("endpoint", None)
 
             self.endpoint_rules.add_fallback(rule, func)
-            self.add_url_rule(rule, endpoint, self.routehelper, **options)
+            self.app.add_url_rule(rule, endpoint, self.routehelper, **options)
             return func
 
         return decorator

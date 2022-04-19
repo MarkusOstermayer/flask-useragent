@@ -42,27 +42,30 @@ it with the ```route()```-Decorator which lead me to write flask-useragent.
 With it, the above example can be written as:
 
 ~~~python
-from flask_useragent import Flask
 from flask import request
+from flask import Flask
+from flask_useragent import FlaskUserAgent
+
 
 app = Flask(__name__)
+ua_app = FlaskUserAgent(app)
 
 
 # This should match user-agents used by curl
-@app.ua_route("/", user_agent=r"curl\/[0-9.]+")
+@ua_app.ua_route("/", user_agent=r"curl\/[0-9.]+")
 def curl_endpoint():
     return "you use curl"
 
 
 # This should match user-agents used by Mozilla Firefox
-@app.ua_route("/", user_agent="Mozilla[.a-zA-Z0-9/ ();_:]+")
+@ua_app.ua_route("/", user_agent="Mozilla[.a-zA-Z0-9/ ();_:]+")
 def firefox_endpoint():
     return "you used a firefox based browser"
 
 
 # This function is used as a fallback function in case either curl nor
 # Firefox is being used
-@app.fallback("/")
+@ua_app.fallback("/")
 def fallback_endpoint():
     user_agent = request.headers.get("User-Agent")
     return f"{user_agent}"
@@ -70,7 +73,6 @@ def fallback_endpoint():
 
 if __name__ == "__main__":
     app.run(debug=True)
-
 ~~~
 
 Usage
@@ -91,19 +93,21 @@ will be used.
 
 The following example shows how to use the ua_route Decorator
 ~~~python
-from flask_useragent import Flask
+from flask import Flask
 from flask import request
+from flask_useragent import FlaskUserAgent
 
 app = Flask(__name__)
+ua_app = FlaskUserAgent(app)
 
 # This uses a specific user-agent-string 
-@app.ua_route("/", user_agent=r"curl/7.82.0")
+@ua_app.ua_route("/", user_agent=r"curl/7.82.0")
 def curl_endpoint_7_82_0():
     return "you use curl 7.82.0"
 
 
 # This uses a regex-string as user-agent
-@app.ua_route("/", user_agent=r"curl\/[0-9.]+")
+@ua_app.ua_route("/", user_agent=r"curl\/[0-9.]+")
 def curl_endpoint():
     return "you use curl"
 
@@ -118,18 +122,20 @@ this Decorater can be used to donate, that the underlying function
 should be used in case the useragent does not match the user-agent-string of
 the other functions.
 ~~~python
-from flask_useragent import Flask
+from flask import Flask
 from flask import request
+from flask_useragent import FlaskUserAgent
 
 app = Flask(__name__)
+ua_app = FlaskUserAgent(app)
 
 
-@app.ua_route("/", user_agent=r"curl\/[0-9.]+")
+@ua_app.ua_route("/", user_agent=r"curl\/[0-9.]+")
 def curl_endpoint():
     return "you use curl"
 
 
-@app.fallback("/")
+@ua_app.fallback("/")
 def fallback_endpoint():
     user_agent = request.headers.get("User-Agent")
     return f"{user_agent}"
