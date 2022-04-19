@@ -26,7 +26,11 @@ class FlaskUserAgent():
 
             endpoint = options.pop("endpoint", None)
 
-            self.endpoint_rules.add_function(rule, user_agent, func)
+            self.endpoint_rules.add_function(
+                rule=rule,
+                user_agent=user_agent,
+                func=func
+            )
 
             self.app.add_url_rule(rule, endpoint, self.routehelper, **options)
 
@@ -44,7 +48,11 @@ class FlaskUserAgent():
 
         return decorator
 
-    def routehelper(self):
+    def routehelper(self, *args, **kwargs):
+        # the extraction of variables from the url is done by flask and can
+        # be passed to the function. This just needs to handle
+        # the finding of the correct function
+
         request_uri = flask.request.path
         user_agent = flask.request.headers.get("User-Agent")
 
@@ -53,4 +61,4 @@ class FlaskUserAgent():
         if not func:
             flask.abort(404)
 
-        return func()
+        return func(*args, **kwargs)

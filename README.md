@@ -150,5 +150,4 @@ TODOs and Problems
 -----
 
 Currently, flask-useragent does not support:  
-* [Variable rules](https://flask.palletsprojects.com/en/2.1.x/quickstart/#variable-rules)  
 * [HTTP Methodes](https://flask.palletsprojects.com/en/2.1.x/quickstart/#http-methods)  

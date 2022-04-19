@@ -128,8 +128,9 @@ def test_fallback_adding(dummy_func, dummy_func_2):
         ("/<float:variable>", "/([0-9]+.[0-9]+)"),
         (
             "/<uuid:variable>",
-            "/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
+            "/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})"
         ),
+        ("/<path:variable>", "/([a-zA-Z0-9/]+)")
     ]
 )
 def test_rule_to_regex(rule, expected_regex):

@@ -69,22 +69,30 @@ class EndpointContainer:
         self.rules: Dict[str, [UserAgentEndpoints]] = {}
 
     def add_function(self, rule: str, user_agent: str, func: Callable):
-        if rule in self.rules:
-            self.rules[rule].add_user_agent_endpoint(user_agent, func)
+
+        re_rule = rule_to_regex(rule)
+
+        if re_rule in self.rules:
+            self.rules[re_rule].add_user_agent_endpoint(user_agent, func)
         else:
-            self.rules[rule] = UserAgentEndpoints(user_agent, func)
+            self.rules[re_rule] = UserAgentEndpoints(user_agent, func)
 
     def add_fallback(self, rule: str, func: Callable):
-        if rule in self.rules:
-            self.rules[rule].add_fallback(func)
+
+        re_rule = rule_to_regex(rule)
+
+        if re_rule in self.rules:
+            self.rules[re_rule].add_fallback(func)
         else:
-            self.rules[rule] = UserAgentEndpoints(None, func)
+            self.rules[re_rule] = UserAgentEndpoints(None, func)
 
     def get_function(self, rule: str, user_agent: str) -> Optional[Callable]:
-        if rule not in self.rules:
-            return None
+        # search for rules that satisfy the regex
+        for re_rule in self.rules:
+            if re.fullmatch(re_rule, rule):
+                return self.rules[re_rule].get_function(user_agent)
 
-        return self.rules[rule].get_function(user_agent)
+        return None
 
     def get_fallback(self, rule: str) -> Optional[Callable]:
         return self.get_function(rule, None)
@@ -104,8 +112,10 @@ def get_substitution(rule: str, position: Tuple[int, int]) -> str:
         return "([0-9]+)"
     if var_type == "float":
         return "([0-9]+.[0-9]+)"
+    if var_type == "path":
+        return "([a-zA-Z0-9/]+)"
     if var_type == "uuid":
-        return "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
+        return "([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})"
 
 
 def rule_to_regex(rule: str) -> str:
